@@ -175,15 +175,15 @@ body {
 }
 .scroll-top {
 	position: fixed;
-	bottom: 40px;
-	right: 5px;
+	bottom: 10%;
+	right: 18px;
 	font-size: 40px;
 	z-index: 9999;
+	cursor: pointer;
 }
 .isShowBtn {
 	opacity: 1;
 	transition: 1s;
-	cursor: pointer;
 }
 .isHideBtn {
 	opacity: 0;

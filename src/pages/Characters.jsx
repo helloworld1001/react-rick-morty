@@ -4,6 +4,8 @@ import axios from 'axios';
 import Card from '../components/Card';
 import ModalWindow from '../components/ModalWindow';
 
+import arrowUp from '../assets/img/arrowUpMini.png'
+
 const Characters = () => {
   const [currentPage, setCurrentPage] = useState('https://rickandmortyapi.com/api/character/?page=1');
   const [characters, setCharacters] = useState([]);
@@ -11,6 +13,7 @@ const Characters = () => {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [dataForModal, setDataForModal] = useState({});
   const [totalCount, setTotalCount] = useState(0);
+  const [showUpBtn, setShowUpBtn] = useState(false);
 
   const scrollHandler = e => {
     if (
@@ -21,10 +24,23 @@ const Characters = () => {
     }
   };
 
+  const toggleShowUpButton = () => {
+    if (window.scrollY > 700) {
+      setShowUpBtn(true);
+    } else {
+      setShowUpBtn(false);
+    }
+  };
+
+  const goToTopOfPage = () => (
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    }));
+  
+
   useEffect(() => {
-    console.log(fetching);
     getCharacters();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetching]);
 
   useEffect(() => {
@@ -32,9 +48,17 @@ const Characters = () => {
     return function () {
       document.removeEventListener('scroll', scrollHandler);
     };
+  }, [fetching]);
+
+  useEffect(() => {
+    document.addEventListener('scroll', toggleShowUpButton);
+    return function () {
+      document.removeEventListener('scroll', toggleShowUpButton);
+    };
   }, []);
 
   const getCharacters = () => {
+
     if (fetching) {
       axios
         .get(currentPage)
@@ -43,21 +67,14 @@ const Characters = () => {
           setCharacters(prev => [...prev, ...data.results]);
           setCurrentPage(data.info.next);
           setTotalCount(data.info.count);
-          console.log(data.info);
           setFetching(false);
         })
         .catch(error => console.log(`The following error occurred: ${error}`));
     }
   };
 
-  const printInfo = () => {
-    console.log(characters);
-  };
-
   return (
     <div className="container">
-      <button onClick={printInfo}>Print info</button>
-
       <div className="characters-wrapper">
         {characters.map(data => (
           <Card
@@ -68,7 +85,12 @@ const Characters = () => {
           />
         ))}
       </div>
+
+      <div className={`scroll-top ${showUpBtn ? `isShowBtn` : `isHideBtn`}`} onClick={goToTopOfPage}>
+        <img src={arrowUp} alt='arrpowUp'/>
+      </div>
       {isOpenModal && <ModalWindow closeModal={() => setIsOpenModal(false)} props={dataForModal} />}
+
     </div>
   );
 };
