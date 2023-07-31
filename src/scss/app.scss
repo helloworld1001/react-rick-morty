@@ -222,3 +222,16 @@ body {
   }
 }
 
+.pagination {
+	
+	li {
+		padding: 10px;
+	border: 1px solid rgb(122, 119, 119);
+	border-radius: 30px;
+	}
+	
+	.activePage {
+	background-color: red;
+}
+	
+}

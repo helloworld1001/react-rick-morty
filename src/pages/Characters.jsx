@@ -4,6 +4,7 @@ import axios from 'axios';
 import Card from '../components/Card';
 import ModalWindow from '../components/ModalWindow';
 import Preloader from '../components/Preloader';
+import Pagination from '../components/Pagination';
 
 import arrowUp from '../assets/img/arrowUpMini.png'
 
@@ -14,9 +15,11 @@ const Characters = () => {
   const [fetching, setFetching] = useState(true);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [dataForModal, setDataForModal] = useState({});
-  const [totalCount, setTotalCount] = useState(0);
+  const [totalItemsCount, setTotalItemsCount] = useState(0);
+  const [totalPagesCount, setTotalPagesCount] = useState(0);
   const [showUpBtn, setShowUpBtn] = useState(false);
   const [isOnPagination, setIsOnPagination] = useState(false);
+  const [changePageFlag, setChangePageFlag] = useState(false);
 
   const getCharacters = () => {
     if (fetching) {
@@ -26,7 +29,8 @@ const Characters = () => {
           const data = response.data;
           setCharacters(prev => [...prev, ...data.results]);
           setCurrentPage(data.info.next);
-          setTotalCount(data.info.count);
+          setTotalItemsCount(data.info.count);
+          setTotalPagesCount(data.info.pages);
           setTimeout(() => {
             setFetching(false);
           }, 1000);
@@ -39,7 +43,7 @@ const Characters = () => {
   const scrollHandler = e => {
     if (
       e.target.documentElement.scrollHeight - (e.target.documentElement.scrollTop + window.innerHeight) < 100 &&
-      characters.length < totalCount
+      characters.length < totalItemsCount
     ) {
       setFetching(true);
     }
@@ -58,6 +62,13 @@ const Characters = () => {
       top: 0,
       behavior: 'smooth',
     });
+
+  const toggleToScrollMode = () => {
+    setIsOnPagination(false);
+     setCharacters([]);
+      setCurrentPage('https://rickandmortyapi.com/api/character/?page=1');
+      setFetching(true);
+  }  
 
   useEffect(() => {
     document.addEventListener('scroll', toggleShowUpButton);
@@ -81,15 +92,27 @@ const Characters = () => {
 
   useEffect(() => {
     if(isOnPagination) {
-      //setCurrentPage('https://rickandmortyapi.com/api/character/?page=1');
+      setCharacters([]);
+      setCurrentPage('https://rickandmortyapi.com/api/character/?page=1');
       setFetching(true);
     }
      console.log(isOnPagination);
   },[isOnPagination])
 
+  useEffect(() => {
+    if(isOnPagination) {
+      setCharacters([]);
+      setCurrentPage(currentPage);
+      setFetching(true);
+      setChangePageFlag(false);
+    }
+     console.log(isOnPagination);
+  },[changePageFlag])
+
+
   return (
     <>
-    <button onClick={() => {setIsOnPagination(!isOnPagination); console.log('pagination')}}>{isOnPagination? 'Pagination off' : 'Pagination on'}</button>
+    <button onClick={!isOnPagination? () => setIsOnPagination(true) : () => toggleToScrollMode()}>{isOnPagination? 'Pagination off' : 'Pagination on'}</button>
       <div className="container">
         <div className="characters-wrapper">
           {characters.map(data => (
@@ -107,6 +130,7 @@ const Characters = () => {
         </div>
         {isOpenModal && <ModalWindow closeModal={() => setIsOpenModal(false)} props={dataForModal} />}
         <Preloader fetching={fetching}/>
+        {isOnPagination && <Pagination pageCount={totalPagesCount} selectCurrentPage = {setCurrentPage} changePageFlag={() => setChangePageFlag(true)}/>}
       </div>
     </>
   );
