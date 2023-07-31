@@ -178,7 +178,7 @@ body {
 	bottom: 10%;
 	right: 18px;
 	font-size: 40px;
-	z-index: 9999;
+	z-index: 1;
 	cursor: pointer;
 }
 .isShowBtn {
@@ -189,23 +189,36 @@ body {
 	opacity: 0;
 	transition: .6s;
 }
+
 .preloader {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	background: #ffffff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fff;
+  z-index: 2;
+  animation-name: hidePreloader;
+  animation-duration: 1.2s;
 }
 
 .hide-preloader {
-  animation: hidePreloader 1.2s;
+  animation: hidePreloader ease-in-out;
 }
 
 .remove-preloader {
   display: none;
+}
+
+@keyframes hidePreloader {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 

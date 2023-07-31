@@ -6,9 +6,6 @@ function App() {
   return (
     <>
       <Characters/>
-      <div className="scroll-top isHideBtn">
-        <i className="fa-solid fa-circle-arrow-up"></i>
-      </div>
     </>
   );
 }

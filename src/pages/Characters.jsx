@@ -3,8 +3,10 @@ import axios from 'axios';
 
 import Card from '../components/Card';
 import ModalWindow from '../components/ModalWindow';
+import Preloader from '../components/Preloader';
 
 import arrowUp from '../assets/img/arrowUpMini.png'
+
 
 const Characters = () => {
   const [currentPage, setCurrentPage] = useState('https://rickandmortyapi.com/api/character/?page=1');
@@ -14,6 +16,25 @@ const Characters = () => {
   const [dataForModal, setDataForModal] = useState({});
   const [totalCount, setTotalCount] = useState(0);
   const [showUpBtn, setShowUpBtn] = useState(false);
+  const [isOnPagination, setIsOnPagination] = useState(false);
+
+  const getCharacters = () => {
+    if (fetching) {
+      axios
+        .get(currentPage)
+        .then(response => {
+          const data = response.data;
+          setCharacters(prev => [...prev, ...data.results]);
+          setCurrentPage(data.info.next);
+          setTotalCount(data.info.count);
+          setTimeout(() => {
+            setFetching(false);
+          }, 1000);
+           
+        })
+        .catch(error => console.log(`The following error occurred: ${error}`));
+    }
+  };
 
   const scrollHandler = e => {
     if (
@@ -32,23 +53,11 @@ const Characters = () => {
     }
   };
 
-  const goToTopOfPage = () => (
+  const goToTopOfPage = () =>
     window.scrollTo({
       top: 0,
       behavior: 'smooth',
-    }));
-  
-
-  useEffect(() => {
-    getCharacters();
-  }, [fetching]);
-
-  useEffect(() => {
-    document.addEventListener('scroll', scrollHandler);
-    return function () {
-      document.removeEventListener('scroll', scrollHandler);
-    };
-  }, [fetching]);
+    });
 
   useEffect(() => {
     document.addEventListener('scroll', toggleShowUpButton);
@@ -57,41 +66,49 @@ const Characters = () => {
     };
   }, []);
 
-  const getCharacters = () => {
+  useEffect(() => {
+    getCharacters();
+  }, [fetching]);
 
-    if (fetching) {
-      axios
-        .get(currentPage)
-        .then(response => {
-          const data = response.data;
-          setCharacters(prev => [...prev, ...data.results]);
-          setCurrentPage(data.info.next);
-          setTotalCount(data.info.count);
-          setFetching(false);
-        })
-        .catch(error => console.log(`The following error occurred: ${error}`));
+  useEffect(() => {
+    if(!isOnPagination) {
+        document.addEventListener('scroll', scrollHandler);
+    return function () {
+      document.removeEventListener('scroll', scrollHandler);
+    };
     }
-  };
+  }, [fetching, isOnPagination]);
+
+  useEffect(() => {
+    if(isOnPagination) {
+      //setCurrentPage('https://rickandmortyapi.com/api/character/?page=1');
+      setFetching(true);
+    }
+     console.log(isOnPagination);
+  },[isOnPagination])
 
   return (
-    <div className="container">
-      <div className="characters-wrapper">
-        {characters.map(data => (
-          <Card
-            key={data.id}
-            openModal={() => setIsOpenModal(true)}
-            setDataForModal={() => setDataForModal(data)}
-            {...data}
-          />
-        ))}
-      </div>
+    <>
+    <button onClick={() => {setIsOnPagination(!isOnPagination); console.log('pagination')}}>{isOnPagination? 'Pagination off' : 'Pagination on'}</button>
+      <div className="container">
+        <div className="characters-wrapper">
+          {characters.map(data => (
+              <Card
+                key={data.id}
+                openModal={() => setIsOpenModal(true)}
+                setDataForModal={() => setDataForModal(data)}
+                {...data}
+              />
+            ))}
+        </div>
 
-      <div className={`scroll-top ${showUpBtn ? `isShowBtn` : `isHideBtn`}`} onClick={goToTopOfPage}>
-        <img src={arrowUp} alt='arrpowUp'/>
+        <div className={`scroll-top ${showUpBtn ? `isShowBtn` : `isHideBtn`}`} onClick={goToTopOfPage}>
+          <img src={arrowUp} alt="arrpowUp" />
+        </div>
+        {isOpenModal && <ModalWindow closeModal={() => setIsOpenModal(false)} props={dataForModal} />}
+        <Preloader fetching={fetching}/>
       </div>
-      {isOpenModal && <ModalWindow closeModal={() => setIsOpenModal(false)} props={dataForModal} />}
-
-    </div>
+    </>
   );
 };
 
