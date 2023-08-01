@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/react-rick-morty/static/css/main.96bd63e9.css",
+    "main.js": "/react-rick-morty/static/js/main.b97a1c1b.js",
+    "static/media/Iphone-spinner-2.gif": "/react-rick-morty/static/media/Iphone-spinner-2.d3fbaf2b81fd92c49692.gif",
+    "index.html": "/react-rick-morty/index.html",
+    "main.96bd63e9.css.map": "/react-rick-morty/static/css/main.96bd63e9.css.map",
+    "main.b97a1c1b.js.map": "/react-rick-morty/static/js/main.b97a1c1b.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.96bd63e9.css",
+    "static/js/main.b97a1c1b.js"
+  ]
+}
