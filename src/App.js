@@ -5,7 +5,7 @@ import './scss/app.scss';
 function App() {
   return (
     <>
-      <Characters/>
+      <Characters />
     </>
   );
 }

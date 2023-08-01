@@ -6,8 +6,8 @@ import ModalWindow from '../components/ModalWindow';
 import Preloader from '../components/Preloader';
 import Pagination from '../components/Pagination';
 
-import arrowUp from '../assets/img/arrowUpMini.png'
-
+import PaginateSwitcherBtn from '../components/PaginateSwitcherBtn';
+import GoToTopBtn from '../components/GoToTopBtn';
 
 const Characters = () => {
   const [currentPage, setCurrentPage] = useState('https://rickandmortyapi.com/api/character/?page=1');
@@ -34,9 +34,8 @@ const Characters = () => {
           setTimeout(() => {
             setFetching(false);
           }, 1000);
-           
         })
-        .catch(error => console.log(`The following error occurred: ${error}`));
+        .catch(error => alert(`The following error occurred: ${error}`));
     }
   };
 
@@ -65,10 +64,10 @@ const Characters = () => {
 
   const toggleToScrollMode = () => {
     setIsOnPagination(false);
-     setCharacters([]);
-      setCurrentPage('https://rickandmortyapi.com/api/character/?page=1');
-      setFetching(true);
-  }  
+    setCharacters([]);
+    setCurrentPage('https://rickandmortyapi.com/api/character/?page=1');
+    setFetching(true);
+  };
 
   useEffect(() => {
     document.addEventListener('scroll', toggleShowUpButton);
@@ -79,58 +78,65 @@ const Characters = () => {
 
   useEffect(() => {
     getCharacters();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetching]);
 
   useEffect(() => {
-    if(!isOnPagination) {
-        document.addEventListener('scroll', scrollHandler);
-    return function () {
-      document.removeEventListener('scroll', scrollHandler);
-    };
+    if (!isOnPagination) {
+      document.addEventListener('scroll', scrollHandler);
+      return function () {
+        document.removeEventListener('scroll', scrollHandler);
+      };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetching, isOnPagination]);
 
   useEffect(() => {
-    if(isOnPagination) {
+    if (isOnPagination) {
       setCharacters([]);
       setCurrentPage('https://rickandmortyapi.com/api/character/?page=1');
       setFetching(true);
     }
-     console.log(isOnPagination);
-  },[isOnPagination])
+  }, [isOnPagination]);
 
   useEffect(() => {
-    if(isOnPagination) {
+    if (isOnPagination) {
       setCharacters([]);
       setCurrentPage(currentPage);
       setFetching(true);
       setChangePageFlag(false);
     }
-     console.log(isOnPagination);
-  },[changePageFlag])
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [changePageFlag]);
 
   return (
     <>
-    <button onClick={!isOnPagination? () => setIsOnPagination(true) : () => toggleToScrollMode()}>{isOnPagination? 'Pagination off' : 'Pagination on'}</button>
       <div className="container">
+        <PaginateSwitcherBtn
+          isOnPagination={isOnPagination}
+          onClick={!isOnPagination ? () => setIsOnPagination(true) : () => toggleToScrollMode()}
+        />
         <div className="characters-wrapper">
           {characters.map(data => (
-              <Card
-                key={data.id}
-                openModal={() => setIsOpenModal(true)}
-                setDataForModal={() => setDataForModal(data)}
-                {...data}
-              />
-            ))}
+            <Card
+              key={data.id}
+              openModal={() => setIsOpenModal(true)}
+              setDataForModal={() => setDataForModal(data)}
+              {...data}
+            />
+          ))}
         </div>
 
-        <div className={`scroll-top ${showUpBtn ? `isShowBtn` : `isHideBtn`}`} onClick={goToTopOfPage}>
-          <img src={arrowUp} alt="arrpowUp" />
-        </div>
+        <GoToTopBtn showUpBtn={showUpBtn} onClick={goToTopOfPage} />
         {isOpenModal && <ModalWindow closeModal={() => setIsOpenModal(false)} props={dataForModal} />}
-        <Preloader fetching={fetching}/>
-        {isOnPagination && <Pagination pageCount={totalPagesCount} selectCurrentPage = {setCurrentPage} changePageFlag={() => setChangePageFlag(true)}/>}
+        <Preloader fetching={fetching} />
+        {isOnPagination && (
+          <Pagination
+            pageCount={totalPagesCount}
+            selectCurrentPage={setCurrentPage}
+            changePageFlag={() => setChangePageFlag(true)}
+          />
+        )}
       </div>
     </>
   );
